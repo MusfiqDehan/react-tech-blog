@@ -11,6 +11,7 @@ import Missing from "./components/Missing";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "./api/posts";
+import useWindowSize from "./hooks/useWindowSize";
 
 function App() {
     const [posts, setPosts] = useState([]);
@@ -20,6 +21,7 @@ function App() {
     const [postBody, setPostBody] = useState("");
     const [editTitle, setEditTitle] = useState("");
     const [editBody, setEditBody] = useState("");
+    const { width } = useWindowSize();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -107,7 +109,13 @@ function App() {
         <Routes>
             <Route
                 path="/"
-                element={<Layout search={search} setSearch={setSearch} />}
+                element={
+                    <Layout
+                        search={search}
+                        setSearch={setSearch}
+                        width={width}
+                    />
+                }
             >
                 <Route index element={<Home posts={searchResults} />} />
 
