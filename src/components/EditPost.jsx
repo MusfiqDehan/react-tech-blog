@@ -5,9 +5,9 @@ const EditPost = ({
     posts,
     handleEdit,
     editBody,
+    setEditBody,
     editTitle,
     setEditTitle,
-    setEditBody,
 }) => {
     const { id } = useParams();
     const post = posts.find((post) => post.id.toString() === id);
@@ -18,6 +18,7 @@ const EditPost = ({
             setEditBody(post.body);
         }
     }, [post, setEditTitle, setEditBody]);
+
     return (
         <main className="NewPost">
             {editTitle && (
@@ -27,17 +28,17 @@ const EditPost = ({
                         className="newPostForm"
                         onSubmit={(e) => e.preventDefault()}
                     >
-                        <label htmlFor="editBody">Title:</label>
+                        <label htmlFor="postTitle">Title:</label>
                         <input
-                            id="editBody"
+                            id="postTitle"
                             type="text"
                             required
                             value={editTitle}
                             onChange={(e) => setEditTitle(e.target.value)}
                         />
-                        <label htmlFor="editBody">Post:</label>
+                        <label htmlFor="postBody">Post:</label>
                         <textarea
-                            id="editBody"
+                            id="postBody"
                             required
                             value={editBody}
                             onChange={(e) => setEditBody(e.target.value)}
@@ -52,9 +53,13 @@ const EditPost = ({
                 </>
             )}
             {!editTitle && (
-                <p>
-                    Post not found. <Link to="/">Go back</Link>
-                </p>
+                <>
+                    <h2>Post Not Found</h2>
+                    <p>Well, that's disappointing.</p>
+                    <p>
+                        <Link to="/">Visit Our Homepage</Link>
+                    </p>
+                </>
             )}
         </main>
     );
