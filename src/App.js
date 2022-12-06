@@ -14,7 +14,6 @@ import api from "./api/posts";
 
 function App() {
     const [posts, setPosts] = useState([]);
-
     const [search, setSearch] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [postTitle, setPostTitle] = useState("");
@@ -27,17 +26,19 @@ function App() {
         const fetchPosts = async () => {
             try {
                 const response = await api.get("/posts");
-                if (response && response.data) setPosts(response.data);
-            } catch (error) {
-                if (error.response) {
-                    console.log(error.response.data);
-                    console.log(error.response.status);
-                    console.log(error.response.headers);
+                setPosts(response.data);
+            } catch (err) {
+                if (err.response) {
+                    // Not in the 200 response range
+                    console.log(err.response.data);
+                    console.log(err.response.status);
+                    console.log(err.response.headers);
                 } else {
-                    console.log(error.message);
+                    console.log(`Error: ${err.message}`);
                 }
             }
         };
+
         fetchPosts();
     }, []);
 
@@ -47,82 +48,58 @@ function App() {
                 post.body.toLowerCase().includes(search.toLowerCase()) ||
                 post.title.toLowerCase().includes(search.toLowerCase())
         );
+
         setSearchResults(filteredResults.reverse());
     }, [posts, search]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const postId = posts.length ? posts[posts.length - 1].id + 1 : 1;
+        const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
         const datetime = format(new Date(), "MMMM dd, yyyy pp");
-        const newPost = {
-            id: postId,
-            title: postTitle,
-            datetime: datetime,
-            body: postBody,
-        };
-
+        const newPost = { id, title: postTitle, datetime, body: postBody };
         try {
             const response = await api.post("/posts", newPost);
             const allPosts = [...posts, response.data];
-
             setPosts(allPosts);
             setPostTitle("");
             setPostBody("");
             navigate("/");
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            } else {
-                console.log(error.message);
-            }
+        } catch (err) {
+            console.log(`Error: ${err.message}`);
         }
     };
 
-    const handleEdit = async (id, title, body) => {
+    const handleEdit = async (id) => {
         const datetime = format(new Date(), "MMMM dd, yyyy pp");
         const updatedPost = {
             id: id,
-            title: title,
-            datetime: datetime,
-            body: body,
+            title: editTitle,
+            datetime,
+            body: editBody,
         };
-
         try {
             const response = await api.put(`/posts/${id}`, updatedPost);
-            const allPosts = posts.map((post) =>
-                post.id === id ? response.data : post
+
+            const allUpdatedPosts = posts.map((post) =>
+                post.id === id ? { ...response.data } : post
             );
-            setPosts(allPosts);
+            setPosts(allUpdatedPosts);
             setEditTitle("");
             setEditBody("");
             navigate("/");
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            } else {
-                console.log(error.message);
-            }
+        } catch (err) {
+            console.log(`Error: ${err.message}`);
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await api.delete(`/posts/${id}`);
-            const postList = posts.filter((post) => post.id !== id);
-            setPosts(postList);
+            const postsList = posts.filter((post) => post.id !== id);
+            setPosts(postsList);
             navigate("/");
-        } catch (error) {
-            if (error.response) {
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-            } else {
-                console.log(error.message);
-            }
+        } catch (err) {
+            console.log(`Error: ${err.message}`);
         }
     };
 
@@ -133,6 +110,7 @@ function App() {
                 element={<Layout search={search} setSearch={setSearch} />}
             >
                 <Route index element={<Home posts={searchResults} />} />
+
                 <Route path="post">
                     <Route
                         index
@@ -156,6 +134,7 @@ function App() {
                         }
                     />
                 </Route>
+
                 <Route path="edit">
                     <Route
                         path=":id"
