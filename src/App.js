@@ -1,6 +1,11 @@
 import "./index.css";
-import React from "react";
+
+import React, { useState, useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+
+import api from "./api/posts";
+
 import Layout from "./components/Layout";
 import Home from "./components/Home";
 import NewPost from "./components/NewPost";
@@ -8,9 +13,7 @@ import PostPage from "./components/PostPage";
 import EditPost from "./components/EditPost";
 import About from "./components/About";
 import Missing from "./components/Missing";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import api from "./api/posts";
+
 import useWindowSize from "./hooks/useWindowSize";
 
 function App() {
